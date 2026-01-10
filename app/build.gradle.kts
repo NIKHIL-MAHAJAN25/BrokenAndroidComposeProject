@@ -1,4 +1,5 @@
 plugins {
+
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -6,9 +7,11 @@ plugins {
 
 android {
     namespace = "com.greedygame.brokenandroidcomposeproject"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
+//    designed to break the gradle
+//    {
+//        version = release(36)
+//    }
 
     defaultConfig {
         applicationId = "com.greedygame.brokenandroidcomposeproject"
