@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.greedygame.brokenandroidcomposeproject.data.Article
-import com.greedygame.brokenandroidcomposeproject.data.BrokenRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -26,18 +25,18 @@ fun NewsScreen() {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                val result = BrokenRepository.fetchArticlesBlocking()
-                articles = result
-                loading = false
-            } catch (e: Exception) {
-                error = e.message
-                loading = false
-            }
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        GlobalScope.launch(Dispatchers.Main) {
+//            try {
+//                val result = BrokenRepository.fetchArticlesBlocking()
+//                articles = result
+//                loading = false
+//            } catch (e: Exception) {
+//                error = e.message
+//                loading = false
+//            }
+//        }
+//    }
 
 
     if (loading) {

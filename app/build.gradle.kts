@@ -1,10 +1,17 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
 
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
-
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) { // <-- This check is missing
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
 android {
     namespace = "com.greedygame.brokenandroidcomposeproject"
     compileSdk = 36
@@ -14,6 +21,8 @@ android {
 //    }
 
     defaultConfig {
+
+        buildConfigField("String", "News", "\"${localProperties.getProperty("NewsApiKey")}\"")
         applicationId = "com.greedygame.brokenandroidcomposeproject"
         minSdk = 24
         targetSdk = 36
@@ -41,6 +50,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig=true
     }
 }
 
