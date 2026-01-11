@@ -60,7 +60,7 @@ This was a broken project given by GreedyGame as an assignment. The major task w
         }
     }
     ```
-    * **Fix:** Replaced with `viewModelScope` in the `ApiViewModel`, which automatically cancels tasks when the ViewModel is cleared.
+    * **Fix:** Replaced with `viewModelScope` in the `ApiViewModel`, which automatically cancels tasks when the ViewModel is cleared and sifted netwrok call off IO thread.
     ``` kotlin
     class NewsRepository (private val database: AppDatabase)
     {
@@ -126,22 +126,26 @@ This was a broken project given by GreedyGame as an assignment. The major task w
     )
     ```
 
-5.  **Missing Database Implementation**
-    * **Issue:** `AppDatabase` was an empty class, and `Article` entities were missing Room annotations.
-    * **Fix:** Added `@Entity`, `@PrimaryKey`, and implemented the `ArticleDao`. Configured Room correctly in `build.gradle`.
+5.  **Incorrect MVVM Implementation**
+    * **Issue:** The project structure was not MVVM that is there were no separation of concerns and business logic was inside UI file.
+    * **Fix:** Moved the logic out of UI and made repository for network calls and ViewModel for Business logic, also implemnented UI states
 
-## 🛠️ Fixes & Improvements Implemented
+## Fixes & Improvements Implemented
 
 * **MVVM Architecture:** Moved all data fetching logic out of the UI (`NewsScreen`) and into `ApiViewModel`. The UI now observes a `StateFlow` for updates.
 * **Offline-First Support:** Implemented a "Single Source of Truth" pattern. The app now saves downloaded news to the local Room database and displays data from there.
-* [cite_start]**Navigation:** Implemented navigation between the News List and a Detail Screen[cite: 56, 82].
+* **Navigation:** Implemented navigation between the News List and a Detail Screen.
 * **Error Handling:** Added try-catch blocks in the Repository and exposed proper `Loading`, `Success`, and `Error` states to the UI.
-* **Code Cleanliness:** Removed hardcoded API keys and dead code.
+* **UI improvement** Moved fetched api details to a clean card view which show details when clicked upon.
+* **Real API call** Removed demo key and implemnted real api key to handle real data and moved the key to local properties securely
+* **Code Cleanliness:** Removed dead code.
 
-## ⏱️ Time Taken
-Approx. 4-5 hours
 
-## 📦 Dependencies Added
-* `androidx.lifecycle:lifecycle-viewmodel-compose` (For ViewModel integration)
-* `androidx.room:room-compiler` (For Database generation)
-* `androidx.room:room-ktx` (For Coroutines support in Room)
+## Time Taken
+Approx. 20 hours since initial commit
+
+## Dependencies Added
+* id("kotlin-kapt")
+* kapt("androidx.room:room-compiler:2.6.1")
+* implementation("androidx.room:room-runtime:2.6.1")
+* implementation("androidx.room:room-ktx:2.6.1")

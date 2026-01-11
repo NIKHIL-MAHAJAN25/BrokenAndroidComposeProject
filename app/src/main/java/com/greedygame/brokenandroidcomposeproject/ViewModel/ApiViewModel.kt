@@ -48,7 +48,7 @@ class ApiViewModel(application: Application) : AndroidViewModel(application)
 
 
     fun fetchnews() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.refreshNews()
             } catch (e: Exception) {
