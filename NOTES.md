@@ -140,7 +140,7 @@ This was a broken project given by GreedyGame as an assignment. The major task w
 * **Real API call** Removed demo key and implemnted real api key to handle real data and moved the key to local properties securely
 * **Code Cleanliness:** Removed dead code.
 
-# App Demo
+
 
 
 
