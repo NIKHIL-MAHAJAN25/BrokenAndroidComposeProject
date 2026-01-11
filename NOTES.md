@@ -30,7 +30,19 @@ This was a broken project given by GreedyGame as an assignment. The major task w
     }
     ```
     
-    * **Fix:** Removed the static companion object reference entirely.
+    * **Fix:** Removed the static companion object reference entirely and passed viewmodel inside parameters of `NewsScreen`, also there was a small bug where padding values were missing for the scafold.
+    ``` kotlin
+    {
+        Scaffold(topBar =
+                { TopAppBar(title =
+                { Text("Broken News")})})
+                { paddingValues ->
+                    Box(modifier = Modifier.padding(paddingValues)) {
+                        NewsScreen(viewModel = viewModel())
+                    }
+                }                
+    }
+    ```
 
 3.  **Incorrect Scope Usage (GlobalScope)**
     * **Issue:** `GlobalScope` was used for fetching data.
@@ -39,6 +51,21 @@ This was a broken project given by GreedyGame as an assignment. The major task w
 
 4.  **JSON Parsing Failures**
     * **Issue:** The mock JSON in `BrokenRepository` used keys (`identifier`, `heading`) that did not match the `Article` data class fields (`id`, `title`).
+    ``` kotlin
+    object BrokenRepository {
+    fun fetchArticlesBlocking(): List<Article> {
+        Thread.sleep(2000)
+        val fakeJson = "[{\"identifier\":1,\"heading\":\"Hello\",\"writer\":\"Alice\"}]"
+        val gson = Gson()
+        val articles: Array<Article> = try {
+            gson.fromJson(fakeJson, Array<Article>::class.java)
+        } catch (e: Exception) {
+            emptyArray()
+        }
+        return articles.toList()
+        }             
+    }
+    ```
     * **Fix:** Implemented proper Retrofit + Gson parsing with a `NewsResponse` DTO to match the actual NewsAPI structure.
 
 5.  **Missing Database Implementation**
