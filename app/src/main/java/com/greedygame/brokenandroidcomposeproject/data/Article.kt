@@ -10,7 +10,7 @@ data class Article(
     val author:String?,
     val title:String?,
     val content:String?,
-    val urlToImage:String? //accesed but didnt make ui item
+    val urlToImage:String?
 )
 data class ArticleResponse(
     val articles:List<Article>,

@@ -1,14 +1,22 @@
 package com.greedygame.brokenandroidcomposeproject.ui
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,55 +38,84 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun NewsScreen(viewModel: ApiViewModel) {
-    val articles by viewModel.articles.collectAsState()
+    val articles by viewModel.articles.collectAsState(initial = emptyList())
     val state by viewModel.uistate.collectAsState()
-    when (state) {
-        is NewsStates.Loading -> {
-            CircularProgressIndicator()
+    var selectedArticle by remember { mutableStateOf<Article?>(null) }
+    BackHandler(enabled = selectedArticle != null) {
+        selectedArticle = null
+    }
+    if (selectedArticle != null) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Button(onClick = { selectedArticle = null }) { Text("Go Back") }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = selectedArticle!!.title ?: "", style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "By ${selectedArticle!!.author ?: "Unknown"}", style = MaterialTheme.typography.labelMedium)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = selectedArticle!!.content ?: "No content", style = MaterialTheme.typography.bodyLarge)
         }
 
-        is NewsStates.Error -> {
-            val msg = (state as NewsStates.Error).message
-            Text(text = msg)
-        }
+    }
+    else {
+        when (state) {
+            is NewsStates.Loading -> {
+                CircularProgressIndicator()
+            }
 
-        is NewsStates.Sucess -> {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(articles) { article ->
-                    androidx.compose.material3.Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    ) {
-                        androidx.compose.foundation.layout.Row(
+            is NewsStates.Error -> {
+                val msg = (state as NewsStates.Error).message
+                Text(text = msg)
+            }
+
+            is NewsStates.Sucess -> {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(articles) { article ->
+                        androidx.compose.material3.Card(
                             modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                                .clickable {
+                                    selectedArticle=article
+                                }
                         ) {
-                            androidx.compose.material3.Icon(
-                                imageVector = androidx.compose.material.icons.Icons.Default.Person,
-                                contentDescription = null,
+                            androidx.compose.foundation.layout.Row(
                                 modifier = Modifier
-                                    .size(60.dp)
-                                    .padding(end = 16.dp)
-                            )
-                            Column {
-                                Text(text = "Title: ${article.title ?: "No title"}")
-                                Text(text = "Author: ${article.author ?: "No author"}")
+                                    .padding(8.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                androidx.compose.material3.Icon(
+                                    imageVector = androidx.compose.material.icons.Icons.Default.Person,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(60.dp)
+                                        .padding(end = 16.dp)
+                                )
+                                Column {
+                                    Text(text = "Title: ${article.title ?: "No title"}")
+                                    Text(text = "Author: ${article.author ?: "No author"}")
+
+                                }
 
                             }
 
                         }
-
                     }
-                }
 
+                }
             }
         }
     }
 }
-    // remember is waste coz forces ui to call network each time screen is rotated
+
+
+// remember is waste coz forces ui to call network each time screen is rotated
 //    var articles by remember { mutableStateOf<List<Article>>(emptyList()) }
 //    var loading by remember { mutableStateOf(true) }
 //    var error by remember { mutableStateOf<String?>(null) }
