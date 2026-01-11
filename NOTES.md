@@ -22,10 +22,10 @@ This was a broken project given by GreedyGame as an assignment. The major task w
      companion object {
         var leakedActivity: MainActivity? = null
         }
-        ```
+    ```
 
     ```kotlin
-     {
+    {
         NewsScreen()                
     }
     ```
