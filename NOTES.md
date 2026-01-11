@@ -23,9 +23,10 @@ This was a broken project given by GreedyGame as an assignment. The major task w
         var leakedActivity: MainActivity? = null
         }
         ```
-        ```kotlin
+
+    ```kotlin
      {
-                   NewsScreen()                
+        NewsScreen()                
     }
     ```
     
