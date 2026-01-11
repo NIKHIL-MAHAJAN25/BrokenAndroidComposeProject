@@ -44,13 +44,55 @@ This was a broken project given by GreedyGame as an assignment. The major task w
     }
     ```
 
-3.  **Incorrect Scope Usage (GlobalScope)**
-    * **Issue:** `GlobalScope` was used for fetching data.
-    * **Impact:** Network requests continued executing even after the screen was destroyed, leading to potential crashes and resource waste.
+3.  **Incorrect Scope Usage (GlobalScope) and network call on main thread**
+    * **Issue:** `GlobalScope` was used for fetching data and network call was made on main thread blocking main ui screen.
+    ``` kotlin
+    LaunchedEffect(Unit) {
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                val result = BrokenRepository.fetchArticlesBlocking()
+                articles = result
+                loading = false
+            } catch (e: Exception) {
+                error = e.message
+                loading = false
+            }
+        }
+    }
+    ```
     * **Fix:** Replaced with `viewModelScope` in the `ApiViewModel`, which automatically cancels tasks when the ViewModel is cleared.
+    ``` kotlin
+    class NewsRepository (private val database: AppDatabase)
+    {
+
+    val articles = database.DAO().getarticles()
+    suspend fun refreshNews() {
+        withContext(Dispatchers.IO) {
+            val response = ApiClient.api.getArticles(BuildConfig.News)
+            if (response.articles.isNotEmpty()) {
+                database.DAO().insertarticles(response.articles)
+            }
+        }
+    }
+    fun getArticleById(id: Int) = database.DAO().getarticlesbyid(id)
+    }
+    ```
+    ``` kotlin
+     private fun observeDatabase() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.articles.collect { list ->
+                if (list.isNotEmpty()) {
+                    _uistate.value = NewsStates.Sucess(list)
+                } else {
+                    _uistate.value = NewsStates.Loading
+                }
+            }
+        }
+    }
+    ```
 
 4.  **JSON Parsing Failures**
-    * **Issue:** The mock JSON in `BrokenRepository` used keys (`identifier`, `heading`) that did not match the `Article` data class fields (`id`, `title`).
+    * **Issue:** The mock JSON in `BrokenRepository` used keys (`identifier`, `heading`) that did not match the `Article` data class fields (`id`, `title`), it caused a serialization error in logcat.
     ``` kotlin
     object BrokenRepository {
     fun fetchArticlesBlocking(): List<Article> {
@@ -67,6 +109,22 @@ This was a broken project given by GreedyGame as an assignment. The major task w
     }
     ```
     * **Fix:** Implemented proper Retrofit + Gson parsing with a `NewsResponse` DTO to match the actual NewsAPI structure.
+    ``` kotlin
+    data class Article(
+    @PrimaryKey(autoGenerate = true)
+    val dbid:Int=0,
+    val author:String?,
+    val title:String?,
+    val content:String?,
+    val urlToImage:String?
+    )
+    data class ArticleResponse(
+    val articles:List<Article>,
+    val status:String,
+    val code:String?,
+    val message:String?
+    )
+    ```
 
 5.  **Missing Database Implementation**
     * **Issue:** `AppDatabase` was an empty class, and `Article` entities were missing Room annotations.

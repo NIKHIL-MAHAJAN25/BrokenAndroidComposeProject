@@ -29,7 +29,7 @@ class ApiViewModel(application: Application) : AndroidViewModel(application)
         fetchnews()
     }
     private fun observeDatabase() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.articles.collect { list ->
                 if (list.isNotEmpty()) {
                     _uistate.value = NewsStates.Sucess(list)
