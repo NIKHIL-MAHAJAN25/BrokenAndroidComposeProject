@@ -18,7 +18,7 @@ This was a broken project given by GreedyGame as an assignment. The major task w
 
 2.  **Memory Leak and inocrrect UI screen call in MainActivity**
     * **Issue:** A static reference `leakedActivity` was holding onto the `Activity` instance preventing garbage collection and also `NewsScreen` function was called without parameters.
-      ```kotlin
+    ```kotlin
      companion object {
         var leakedActivity: MainActivity? = null
         }
@@ -27,7 +27,8 @@ This was a broken project given by GreedyGame as an assignment. The major task w
      {
                    NewsScreen()                
     }
-        ```
+    ```
+    
     * **Fix:** Removed the static companion object reference entirely.
 
 3.  **Incorrect Scope Usage (GlobalScope)**
