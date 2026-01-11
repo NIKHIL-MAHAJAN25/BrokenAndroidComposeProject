@@ -1,24 +1,24 @@
 package com.greedygame.brokenandroidcomposeproject.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.Gson
-
+@Entity(tableName = "articlestable")
 data class Article(
-   val source:Sources?,
+    @PrimaryKey(autoGenerate = true)
+    val dbid:Int=0,
     val author:String?,
     val title:String?,
     val content:String?,
-    val urlToImage:String?
+    val urlToImage:String? //accesed but didnt make ui item
 )
 data class ArticleResponse(
-    val article:List<Article>,
+    val articles:List<Article>,
     val status:String,
     val code:String?,
     val message:String?
 )
-data class Sources(
-    val id:String?,
-    val name:String?
-)
+
 //data class Article(
 //    val id: Int,
 //    val title: String,
